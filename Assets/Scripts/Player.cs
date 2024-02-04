@@ -10,14 +10,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Rigidbody2D rgbd;
 
-    [SerializeField]
-    private Rigidbody2D leftside;
-
-    [SerializeField]
-    private Rigidbody2D rightside;
-
-    public bool IsTouchingLayers;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -42,12 +34,11 @@ public class Player : MonoBehaviour
             rgbd.AddForce(Vector2.down * 10);
         }
 
-        if (IsTouchingLayers) ;
+
+        if (Input.GetKeyDown(upKey))
         {
-            if (Input.GetKeyDown(upKey))
-            {
                 rgbd.AddForce(Vector2.up * 600);
-            }
         }
+      
     }
 }
