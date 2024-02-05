@@ -2,19 +2,12 @@ using UnityEngine;
 
 public class Ennemies : MonoBehaviour
 {
-    private string pointObjectiv;
+    private string pointObjectiv = "B";
     
     public float moovSpeed;
     public Rigidbody2D rgbd;
     public Transform pointA;
     public Transform pointB;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        pointObjectiv = "B";
-    }
-
 
     void OnTriggerEnter2D(Collider2D col)
     {

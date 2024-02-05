@@ -18,13 +18,14 @@ public class PlayerMovement : MonoBehaviour
     
     public float jumpForce;
     public float moovSpeed;
-    
-    
+
+    public bool GotShield;
+
     // private variables
-    public bool IsGrounded;
-    public bool IsLeftWalled;
-    public bool IsRightWalled;
-    public bool GotShield ;
+    private bool IsGrounded;
+    private bool IsLeftWalled;
+    private bool IsRightWalled;
+
 
 
     void Start()
