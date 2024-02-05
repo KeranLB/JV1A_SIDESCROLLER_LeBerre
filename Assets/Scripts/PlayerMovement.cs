@@ -2,100 +2,73 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed;
-    public float climbSpeed;
+    // public variable
+    public KeyCode leftKey, rightKey, upKey;
+    
+    public Rigidbody2D rgbd;
+
+    public Transform LeftCheckGrounbed;
+    public Transform RightCheckGrounded;
+
+    public Transform TopLeftCheckWalled;
+    public Transform BottomLeftCheckWalled;
+
+    public Transform TopRightCheckWalled;
+    public Transform BottomRightCheckWalled;
+    
     public float jumpForce;
+    public float moovSpeed;
+    
+    
+    // private variables
+    public bool IsGrounded;
+    public bool IsLeftWalled;
+    public bool IsRightWalled;
+    public bool GotShield ;
 
-    private bool isJumping;
-    private bool isGrounded;
-    [HideInInspector]
-    public bool isClimbing;
 
-    public Transform groundCheck;
-    public float groundCheckRadius;
-    public LayerMask collisionLayers;
-
-    public Rigidbody2D rb;
-    public Animator animator;
-    public SpriteRenderer spriteRenderer;
-    public CapsuleCollider2D playerCollider;
-
-    private Vector3 velocity = Vector3.zero;
-    private float horizontalMovement;
-    private float verticalMovement;
-
-    public static PlayerMovement instance;
-
-    private void Awake()
+    void Start()
     {
-        if (instance != null)
-        {
-            Debug.LogWarning("Il y a plus d'une instance de PlayerMovement dans la scène");
-            return;
-        }
+        GotShield = false;
 
-        instance = this;
     }
 
     void Update()
     {
-        horizontalMovement = Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime;
-        verticalMovement = Input.GetAxis("Vertical") * climbSpeed * Time.fixedDeltaTime;
+        IsGrounded = Physics2D.OverlapArea(LeftCheckGrounbed.position, RightCheckGrounded.position);
+        IsLeftWalled = Physics2D.OverlapArea(TopLeftCheckWalled.position, BottomLeftCheckWalled.position);
+        IsRightWalled = Physics2D.OverlapArea(TopRightCheckWalled.position, BottomRightCheckWalled.position);
 
-        if (Input.GetButtonDown("Jump") && isGrounded && !isClimbing)
+        if (Input.GetKey(leftKey))
         {
-            isJumping = true;
+            rgbd.AddForce(Vector2.left * moovSpeed);
         }
-
-        Flip(rb.velocity.x);
-
-        float characterVelocity = Mathf.Abs(rb.velocity.x);
-        animator.SetFloat("Speed", characterVelocity);
-        animator.SetBool("isClimbing", isClimbing);
-    }
-
-    void FixedUpdate()
-    {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, collisionLayers);
-        MovePlayer(horizontalMovement, verticalMovement);
-    }
-
-    void MovePlayer(float _horizontalMovement, float _verticalMovement)
-    {
-        if (!isClimbing)
+        if (Input.GetKey(rightKey))
         {
-            Vector3 targetVelocity = new Vector2(_horizontalMovement, rb.velocity.y);
-            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, .05f);
-
-            if (isJumping)
+            rgbd.AddForce(Vector2.right * moovSpeed);
+        }
+        if (IsGrounded)
+        {
+            if (Input.GetKeyDown(upKey))
             {
-                rb.AddForce(new Vector2(0f, jumpForce));
-                isJumping = false;
+                rgbd.AddForce(Vector2.up * jumpForce);
             }
         }
-        else
+        else if (IsLeftWalled)
         {
-            Vector3 targetVelocity = new Vector2(0, _verticalMovement);
-            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, .05f);
+            if (Input.GetKeyDown(upKey))
+            {
+                rgbd.AddForce(Vector2.up * jumpForce * 0.75f);
+                rgbd.AddForce(Vector2.right * jumpForce);
+            }       
         }
-
-    }
-
-    void Flip(float _velocity)
-    {
-        if (_velocity > 0.1f)
+        else if (IsRightWalled)
         {
-            spriteRenderer.flipX = false;
+            if(Input.GetKeyDown(upKey))
+            {
+                rgbd.AddForce(Vector2.up * jumpForce * 0.75f);
+                rgbd.AddForce(Vector2.left * jumpForce);
+            }
         }
-        else if (_velocity < -0.1f)
-        {
-            spriteRenderer.flipX = true;
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }
